@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/Meplos/zenyth/observer"
 	"github.com/robfig/cron"
 )
 
@@ -39,6 +40,8 @@ type Task struct {
 	Hour       string
 	DayInMonth string
 	DayInWeek  string
+
+	observer []observer.Observer[Task]
 }
 
 func NewTask(def TaskDef) Task {
@@ -63,6 +66,8 @@ func NewTask(def TaskDef) Task {
 		Hour:       cronExpr[2],
 		DayInMonth: cronExpr[3],
 		DayInWeek:  cronExpr[4],
+
+		observer: make([]observer.Observer[Task], 0),
 	}
 }
 
@@ -98,6 +103,16 @@ func (t *Task) Run() {
 
 func (t *Task) Schedule(c *cron.Cron) {
 	c.AddJob(t.Cron, t)
+}
+
+func (t *Task) AddObserver(o observer.Observer[Task]) {
+	t.observer = append(t.observer, o)
+}
+
+func (t *Task) Notify(event observer.Event) {
+	for _, o := range t.observer {
+		o.Notify(event, *t)
+	}
 }
 
 func taskToBytes(task TaskDef) []byte {
