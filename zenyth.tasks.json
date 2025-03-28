@@ -1,0 +1,7 @@
+[
+  {
+    "name": "cron-test-1",
+    "exec": "/bin/ls",
+    "cron": "* * * * *"
+  }
+]
