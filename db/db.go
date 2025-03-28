@@ -29,7 +29,28 @@ func (zDB *ZenythDatabase) Init() {
 }
 
 func (zDB *ZenythDatabase) CreateTask(t tasks.Task) {
-	zDB.Db.Create(&repo.TaskEntity{
+	newTask := repo.TaskEntity{
+		Name:    t.Name,
+		Exec:    t.Exec,
+		LogFile: t.LogFile,
+		State:   string(t.State),
+		Hash:    t.Hash,
+
+		Cron:       t.Cron,
+		Second:     t.Second,
+		Minute:     t.Minute,
+		Hour:       t.Hour,
+		DayInMonth: t.DayInMonth,
+		DayInWeek:  t.DayInWeek,
+	}
+	zDB.Db.Create(&newTask)
+	log.Printf("Task Created with ID=%v", newTask.ID)
+}
+
+func (zDB *ZenythDatabase) UpdateTask(t tasks.Task) {
+	var model repo.TaskEntity
+	zDB.Db.First(&model, "name=?", t.Name)
+	zDB.Db.Model(&model).Updates(repo.TaskEntity{
 		Name:    t.Name,
 		Exec:    t.Exec,
 		LogFile: t.LogFile,

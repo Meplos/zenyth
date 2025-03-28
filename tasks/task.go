@@ -24,7 +24,7 @@ const (
 	PENDING TaskState = "PENDING"
 	RUNING  TaskState = "RUNING"
 	ERRORED TaskState = "ERRORED"
-	STOPED  TaskState = "STOPED"
+	STOPPED TaskState = "STOPED"
 )
 
 type Task struct {
@@ -44,7 +44,7 @@ type Task struct {
 	observer []observer.Observer[Task]
 }
 
-func NewTask(def TaskDef) Task {
+func NewTask(def TaskDef, o observer.Observer[Task]) Task {
 	cronExpr := strings.Split(def.Cron, " ")
 	if len(cronExpr) != 5 {
 		log.Fatalf("Invalid CRON expression for %v", def.Name)
@@ -53,7 +53,7 @@ func NewTask(def TaskDef) Task {
 
 	hash := md5.Sum(bytes)
 
-	return Task{
+	t := Task{
 		Name:    def.Name,
 		Exec:    def.Exec,
 		LogFile: fmt.Sprintf("/tmp/.zenyth/%v.log", def.Name),
@@ -69,18 +69,29 @@ func NewTask(def TaskDef) Task {
 
 		observer: make([]observer.Observer[Task], 0),
 	}
+	t.AddObserver(o)
+	t.Notify(observer.Create)
+	return t
 }
 
 func (t *Task) Running() {
 	t.State = RUNING
+	t.Notify(observer.Update)
 }
 
 func (t *Task) Pending() {
 	t.State = PENDING
+	t.Notify(observer.Update)
 }
 
 func (t *Task) Errored() {
 	t.State = ERRORED
+	t.Notify(observer.Update)
+}
+
+func (t *Task) Stopped() {
+	t.State = STOPPED
+	t.Notify(observer.Update)
 }
 
 func (t *Task) Run() {
