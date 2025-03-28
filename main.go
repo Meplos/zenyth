@@ -27,11 +27,10 @@ func Init() {
 		panic(err)
 	}
 	definitions := config.ParseTaskDef(string(bytes))
-	// runnableTasks := make([]tasks.Task, len(definitions))
 	taskObserver := New(db)
-	var t tasks.Task
+	var t *tasks.Task
 	for _, def := range definitions {
-		t = tasks.NewTask(def, &taskObserver)
+		t = LoadTask(def, db, &taskObserver)
 		t.Schedule(c)
 	}
 
@@ -40,6 +39,28 @@ func Init() {
 	time.Sleep(5 * time.Second)
 	c.Stop()
 	t.Stopped()
+}
+
+func LoadTask(t tasks.TaskDef, db *db.ZenythDatabase, o observer.Observer[tasks.Task]) *tasks.Task {
+	log.Println("Load %v", t.Name)
+	saveTask := db.FindTask(t.Name)
+	newTask := tasks.NewTask(t)
+	newTask.AddObserver(o)
+	if saveTask == nil {
+		log.Printf("New task detected : %v", newTask.Name)
+		o.Notify(observer.Create, *newTask)
+		return newTask
+	}
+
+	if saveTask.Hash == newTask.Hash {
+		log.Printf("Task modification detected: %v", newTask.Name)
+		o.Notify(observer.Update, *newTask)
+		return newTask
+	}
+
+	log.Printf("No change detected for : %v", newTask.Name)
+
+	return newTask
 }
 
 type TaskObserver struct {

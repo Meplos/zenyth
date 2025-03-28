@@ -2,6 +2,6 @@
   {
     "name": "cron-test-1",
     "exec": "/bin/ls",
-    "cron": "* * * * *"
+    "cron": "* * * 2 *"
   }
 ]

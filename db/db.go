@@ -47,6 +47,18 @@ func (zDB *ZenythDatabase) CreateTask(t tasks.Task) {
 	log.Printf("Task Created with ID=%v", newTask.ID)
 }
 
+func (zDB *ZenythDatabase) FindTask(name string) *tasks.Task {
+	var t repo.TaskEntity
+	result := zDB.Db.Where("name = ?", name).First(&t)
+	if result.Error != nil {
+		return nil
+	}
+	log.Printf("Task found %v", t)
+	log.Printf("Task found ID:%v", t.ID)
+	task := tasks.FromEntity(t)
+	return &task
+}
+
 func (zDB *ZenythDatabase) UpdateTask(t tasks.Task) {
 	var model repo.TaskEntity
 	zDB.Db.First(&model, "name=?", t.Name)

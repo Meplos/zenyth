@@ -6,10 +6,10 @@ import (
 
 type TaskEntity struct {
 	gorm.Model
-	Name    string
+	Name    string `gorm:"primarykey"`
 	Exec    string
 	LogFile string
-	Hash    [16]byte
+	Hash    string
 	State   string
 
 	Cron       string

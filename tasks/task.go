@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/Meplos/zenyth/db/repository"
 	"github.com/Meplos/zenyth/observer"
 	"github.com/robfig/cron"
 )
@@ -31,7 +32,7 @@ type Task struct {
 	Name    string
 	Exec    string
 	LogFile string
-	Hash    [16]byte
+	Hash    string
 	State   TaskState
 
 	Cron       string
@@ -44,7 +45,7 @@ type Task struct {
 	observer []observer.Observer[Task]
 }
 
-func NewTask(def TaskDef, o observer.Observer[Task]) Task {
+func NewTask(def TaskDef) *Task {
 	cronExpr := strings.Split(def.Cron, " ")
 	if len(cronExpr) != 5 {
 		log.Fatalf("Invalid CRON expression for %v", def.Name)
@@ -53,12 +54,12 @@ func NewTask(def TaskDef, o observer.Observer[Task]) Task {
 
 	hash := md5.Sum(bytes)
 
-	t := Task{
+	return &Task{
 		Name:    def.Name,
 		Exec:    def.Exec,
 		LogFile: fmt.Sprintf("/tmp/.zenyth/%v.log", def.Name),
 		State:   PENDING,
-		Hash:    hash,
+		Hash:    string(hash[:]),
 
 		Cron:       def.Cron,
 		Second:     cronExpr[0],
@@ -69,9 +70,6 @@ func NewTask(def TaskDef, o observer.Observer[Task]) Task {
 
 		observer: make([]observer.Observer[Task], 0),
 	}
-	t.AddObserver(o)
-	t.Notify(observer.Create)
-	return t
 }
 
 func (t *Task) Running() {
@@ -132,4 +130,23 @@ func taskToBytes(task TaskDef) []byte {
 		log.Fatalf("Unable to marshall task : %v", task.Name)
 	}
 	return bytes
+}
+
+func FromEntity(t repository.TaskEntity) Task {
+	return Task{
+		Name:    t.Name,
+		Exec:    t.Exec,
+		State:   TaskState(t.State),
+		LogFile: t.LogFile,
+		Hash:    t.Hash,
+
+		Cron:       t.Cron,
+		Second:     t.Second,
+		Minute:     t.Minute,
+		Hour:       t.Hour,
+		DayInMonth: t.DayInMonth,
+		DayInWeek:  t.DayInWeek,
+
+		observer: make([]observer.Observer[Task], 0),
+	}
 }
