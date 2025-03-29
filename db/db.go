@@ -29,6 +29,20 @@ func (zDB *ZenythDatabase) Init() {
 	zDB.Db.AutoMigrate(&repo.ExecutionEntity{})
 }
 
+func (zDB *ZenythDatabase) ListTask() []tasks.Task {
+	var dbTasks []repo.TaskEntity
+	result := zDB.Db.Find(&dbTasks)
+	if result.Error != nil {
+		log.Fatalf("Query all tasks fail")
+	}
+
+	ts := make([]tasks.Task, 0)
+	for _, t := range dbTasks {
+		ts = append(ts, tasks.FromEntity(t))
+	}
+	return ts
+}
+
 func (zDB *ZenythDatabase) CreateTask(t tasks.Task) {
 	newTask := repo.TaskEntity{
 		Name:    t.Name,
