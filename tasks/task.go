@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/Meplos/zenyth/db/repository"
 	"github.com/Meplos/zenyth/observer"
@@ -20,7 +21,15 @@ type TaskDef struct {
 	Runner string `json:"runner"`
 }
 
-type TaskState string
+type (
+	TaskState    string
+	ProcessState string
+)
+
+const (
+	SUCCESS ProcessState = "SUCCESS"
+	FAILURE ProcessState = "FAILURE"
+)
 
 const (
 	PENDING TaskState = "PENDING"
@@ -44,7 +53,8 @@ type Task struct {
 	Month      string
 	DayInWeek  string
 
-	observer []observer.Observer[Task]
+	taskObserver []observer.Observer[Task]
+	execObserver []observer.Observer[Execution]
 }
 
 func NewTask(def TaskDef) *Task {
@@ -71,7 +81,8 @@ func NewTask(def TaskDef) *Task {
 		Month:      cronExpr[3],
 		DayInWeek:  cronExpr[4],
 
-		observer: make([]observer.Observer[Task], 0),
+		taskObserver: make([]observer.Observer[Task], 0),
+		execObserver: make([]observer.Observer[Execution], 0),
 	}
 }
 
@@ -96,35 +107,55 @@ func (t *Task) Stopped() {
 }
 
 func (t *Task) Run() {
+	start := time.Now()
 	t.Running()
 	log.Printf("Task starting %v, with command %v [hash=%v, state=%v]", t.Name, t.Exec, string(t.Hash[:]), t.State)
 	// Execute commande
 	runner := runners.GetRunner(t.Runner)
 	output, err := runner.Exec(t.Exec)
-	if err != nil {
-		t.Errored()
-		return
-	}
+	end := time.Now()
 	lines := strings.Split(string(output), "\n")
 	for _, l := range lines {
 		log.Printf(l)
 	}
+	if err != nil {
+		t.Errored()
+		t.EndProcess(start, end, FAILURE)
+		log.Printf("Task FAILED %v, with command %v [hash=%v, state=%v]", t.Name, t.Exec, string(t.Hash[:]), t.State)
+		return
+	}
 
 	t.Pending()
 	log.Printf("Task termindated %v, with command %v [hash=%v, state=%v]", t.Name, t.Exec, string(t.Hash[:]), t.State)
+	t.EndProcess(start, end, SUCCESS)
+}
+
+func (t *Task) EndProcess(start, end time.Time, state ProcessState) {
+	execution := NewExecution(t.Name, start, end, state)
+	t.NotifyExecution(observer.Terminated, execution)
 }
 
 func (t *Task) Schedule(c *cron.Cron) {
 	c.AddJob(t.Cron, t)
 }
 
-func (t *Task) AddObserver(o observer.Observer[Task]) {
-	t.observer = append(t.observer, o)
+func (t *Task) AddTaskObserver(o observer.Observer[Task]) {
+	t.taskObserver = append(t.taskObserver, o)
+}
+
+func (t *Task) AddExecutionObserver(o observer.Observer[Execution]) {
+	t.execObserver = append(t.execObserver, o)
 }
 
 func (t *Task) Notify(event observer.Event) {
-	for _, o := range t.observer {
+	for _, o := range t.taskObserver {
 		o.Notify(event, *t)
+	}
+}
+
+func (t *Task) NotifyExecution(event observer.Event, data Execution) {
+	for _, o := range t.execObserver {
+		o.Notify(event, data)
 	}
 }
 
@@ -152,6 +183,6 @@ func FromEntity(t repository.TaskEntity) Task {
 		Month:      t.Month,
 		DayInWeek:  t.DayInWeek,
 
-		observer: make([]observer.Observer[Task], 0),
+		taskObserver: make([]observer.Observer[Task], 0),
 	}
 }

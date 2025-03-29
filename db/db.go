@@ -26,6 +26,7 @@ func Connect() *ZenythDatabase {
 
 func (zDB *ZenythDatabase) Init() {
 	zDB.Db.AutoMigrate(&repo.TaskEntity{})
+	zDB.Db.AutoMigrate(&repo.ExecutionEntity{})
 }
 
 func (zDB *ZenythDatabase) CreateTask(t tasks.Task) {
@@ -54,8 +55,6 @@ func (zDB *ZenythDatabase) FindTask(name string) *tasks.Task {
 	if result.Error != nil {
 		return nil
 	}
-	log.Printf("Task found %v", t)
-	log.Printf("Task found ID:%v", t.ID)
 	task := tasks.FromEntity(t)
 	return &task
 }
@@ -78,4 +77,15 @@ func (zDB *ZenythDatabase) UpdateTask(t tasks.Task) {
 		Month:      t.Month,
 		DayInWeek:  t.DayInWeek,
 	})
+}
+
+func (zDB *ZenythDatabase) LogExectution(e tasks.Execution) {
+	newTask := repo.ExecutionEntity{
+		Task:     e.Task,
+		Start:    e.Start,
+		End:      e.End,
+		Duration: e.Duration,
+		Status:   string(e.Status),
+	}
+	zDB.Db.Create(&newTask)
 }

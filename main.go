@@ -27,16 +27,18 @@ func Init() {
 		panic(err)
 	}
 	definitions := config.ParseTaskDef(string(bytes))
-	taskObserver := New(db)
+	taskObserver := NewTaskObserver(db)
+	execObserver := NewExecutionObserver(db)
 	var t *tasks.Task
 	for _, def := range definitions {
 		t = LoadTask(def, db, &taskObserver)
+		t.AddExecutionObserver(&execObserver)
 		t.Schedule(c)
 	}
 
 	c.Start()
 
-	time.Sleep(5 * time.Second)
+	time.Sleep(15 * time.Minute)
 	c.Stop()
 	t.Stopped()
 }
@@ -45,7 +47,7 @@ func LoadTask(t tasks.TaskDef, db *db.ZenythDatabase, o observer.Observer[tasks.
 	log.Printf("Load %v\n", t.Name)
 	saveTask := db.FindTask(t.Name)
 	newTask := tasks.NewTask(t)
-	newTask.AddObserver(o)
+	newTask.AddTaskObserver(o)
 	if saveTask == nil {
 		log.Printf("New task detected : %v", newTask.Name)
 		o.Notify(observer.Create, *newTask)
@@ -67,9 +69,27 @@ type TaskObserver struct {
 	db *db.ZenythDatabase
 }
 
-func New(db *db.ZenythDatabase) TaskObserver {
+type ExecutionObserver struct {
+	db *db.ZenythDatabase
+}
+
+func NewTaskObserver(db *db.ZenythDatabase) TaskObserver {
 	return TaskObserver{
 		db: db,
+	}
+}
+
+func NewExecutionObserver(db *db.ZenythDatabase) ExecutionObserver {
+	return ExecutionObserver{
+		db: db,
+	}
+}
+
+func (o *ExecutionObserver) Notify(event observer.Event, data tasks.Execution) {
+	switch event {
+	case observer.Terminated:
+		o.db.LogExectution(data)
+		break
 	}
 }
 
