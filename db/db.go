@@ -37,10 +37,10 @@ func (zDB *ZenythDatabase) CreateTask(t tasks.Task) {
 		Hash:    t.Hash,
 
 		Cron:       t.Cron,
-		Second:     t.Second,
 		Minute:     t.Minute,
 		Hour:       t.Hour,
 		DayInMonth: t.DayInMonth,
+		Month:      t.Month,
 		DayInWeek:  t.DayInWeek,
 	}
 	zDB.Db.Create(&newTask)
@@ -70,10 +70,10 @@ func (zDB *ZenythDatabase) UpdateTask(t tasks.Task) {
 		Hash:    t.Hash,
 
 		Cron:       t.Cron,
-		Second:     t.Second,
 		Minute:     t.Minute,
 		Hour:       t.Hour,
 		DayInMonth: t.DayInMonth,
+		Month:      t.Month,
 		DayInWeek:  t.DayInWeek,
 	})
 }

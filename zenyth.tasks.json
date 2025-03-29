@@ -3,5 +3,11 @@
     "name": "cron-test-1",
     "exec": "/bin/ls",
     "cron": "* * * 2 *"
+  },
+  {
+    "name": "weather-1",
+    "runner": "bun",
+    "exec": "/home/meplos/weather/index.ts",
+    "cron": "* * * * *"
   }
 ]

@@ -36,10 +36,10 @@ type Task struct {
 	State   TaskState
 
 	Cron       string
-	Second     string
 	Minute     string
 	Hour       string
 	DayInMonth string
+	Month      string
 	DayInWeek  string
 
 	observer []observer.Observer[Task]
@@ -62,10 +62,10 @@ func NewTask(def TaskDef) *Task {
 		Hash:    string(hash[:]),
 
 		Cron:       def.Cron,
-		Second:     cronExpr[0],
-		Minute:     cronExpr[1],
-		Hour:       cronExpr[2],
-		DayInMonth: cronExpr[3],
+		Minute:     cronExpr[0],
+		Hour:       cronExpr[1],
+		DayInMonth: cronExpr[2],
+		Month:      cronExpr[3],
 		DayInWeek:  cronExpr[4],
 
 		observer: make([]observer.Observer[Task], 0),
@@ -141,10 +141,10 @@ func FromEntity(t repository.TaskEntity) Task {
 		Hash:    t.Hash,
 
 		Cron:       t.Cron,
-		Second:     t.Second,
 		Minute:     t.Minute,
 		Hour:       t.Hour,
 		DayInMonth: t.DayInMonth,
+		Month:      t.Month,
 		DayInWeek:  t.DayInWeek,
 
 		observer: make([]observer.Observer[Task], 0),
