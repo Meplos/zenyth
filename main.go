@@ -42,7 +42,7 @@ func Init() {
 }
 
 func LoadTask(t tasks.TaskDef, db *db.ZenythDatabase, o observer.Observer[tasks.Task]) *tasks.Task {
-	log.Println("Load %v", t.Name)
+	log.Printf("Load %v\n", t.Name)
 	saveTask := db.FindTask(t.Name)
 	newTask := tasks.NewTask(t)
 	newTask.AddObserver(o)

@@ -10,6 +10,7 @@ type TaskEntity struct {
 	Exec    string
 	LogFile string
 	Hash    string
+	Runner  string
 	State   string
 
 	Cron       string

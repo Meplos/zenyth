@@ -5,18 +5,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"os/exec"
 	"strings"
 
 	"github.com/Meplos/zenyth/db/repository"
 	"github.com/Meplos/zenyth/observer"
+	"github.com/Meplos/zenyth/runners"
 	"github.com/robfig/cron"
 )
 
 type TaskDef struct {
-	Name string `json:"name"`
-	Exec string `json:"exec"`
-	Cron string `json:"cron"`
+	Name   string `json:"name"`
+	Exec   string `json:"exec"`
+	Cron   string `json:"cron"`
+	Runner string `json:"runner"`
 }
 
 type TaskState string
@@ -34,6 +35,7 @@ type Task struct {
 	LogFile string
 	Hash    string
 	State   TaskState
+	Runner  string
 
 	Cron       string
 	Minute     string
@@ -59,6 +61,7 @@ func NewTask(def TaskDef) *Task {
 		Exec:    def.Exec,
 		LogFile: fmt.Sprintf("/tmp/.zenyth/%v.log", def.Name),
 		State:   PENDING,
+		Runner:  def.Runner,
 		Hash:    string(hash[:]),
 
 		Cron:       def.Cron,
@@ -96,7 +99,8 @@ func (t *Task) Run() {
 	t.Running()
 	log.Printf("Task starting %v, with command %v [hash=%v, state=%v]", t.Name, t.Exec, string(t.Hash[:]), t.State)
 	// Execute commande
-	output, err := exec.Command(t.Exec).Output()
+	runner := runners.GetRunner(t.Runner)
+	output, err := runner.Exec(t.Exec)
 	if err != nil {
 		t.Errored()
 		return
@@ -138,6 +142,7 @@ func FromEntity(t repository.TaskEntity) Task {
 		Exec:    t.Exec,
 		State:   TaskState(t.State),
 		LogFile: t.LogFile,
+		Runner:  t.Runner,
 		Hash:    t.Hash,
 
 		Cron:       t.Cron,

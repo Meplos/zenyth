@@ -34,6 +34,7 @@ func (zDB *ZenythDatabase) CreateTask(t tasks.Task) {
 		Exec:    t.Exec,
 		LogFile: t.LogFile,
 		State:   string(t.State),
+		Runner:  t.Runner,
 		Hash:    t.Hash,
 
 		Cron:       t.Cron,
@@ -67,6 +68,7 @@ func (zDB *ZenythDatabase) UpdateTask(t tasks.Task) {
 		Exec:    t.Exec,
 		LogFile: t.LogFile,
 		State:   string(t.State),
+		Runner:  t.Runner,
 		Hash:    t.Hash,
 
 		Cron:       t.Cron,
