@@ -8,6 +8,7 @@ import (
 	"github.com/Meplos/zenyth/config"
 	"github.com/Meplos/zenyth/db"
 	"github.com/Meplos/zenyth/observer"
+	"github.com/Meplos/zenyth/server"
 	taskobserver "github.com/Meplos/zenyth/taskObserver"
 	"github.com/Meplos/zenyth/tasks"
 	"github.com/robfig/cron"
@@ -17,6 +18,7 @@ type App struct {
 	db        *db.ZenythDatabase
 	scheduler *cron.Cron
 	taskFile  string
+	server    *server.ZenythServer
 }
 
 func Init() *App {
@@ -27,6 +29,7 @@ func Init() *App {
 		db:        zdb,
 		scheduler: scheduler,
 		taskFile:  "zenyth.tasks.json",
+		server:    server.Init(),
 	}
 }
 
@@ -49,20 +52,21 @@ func (a *App) Run() {
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
-	exit := false
 	go func() {
 		for range c {
 			a.Stop()
-			exit = true
 		}
 	}()
 
-	for exit != true {
+	go a.server.Run()
+	for true {
 	}
 }
 
 func (a *App) Stop() {
 	a.scheduler.Stop()
+	a.server.Stop()
+	os.Exit(0)
 }
 
 func (a *App) loadTask(t tasks.TaskDef, db *db.ZenythDatabase, o observer.Observer[tasks.Task]) *tasks.Task {

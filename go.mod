@@ -3,6 +3,7 @@ module github.com/Meplos/zenyth
 go 1.23.4
 
 require (
+	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/robfig/cron v1.2.0
 	gorm.io/driver/sqlite v1.5.7
 	gorm.io/gorm v1.25.12
@@ -10,7 +11,6 @@ require (
 
 require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
-	github.com/gofiber/fiber/v2 v2.52.6 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
