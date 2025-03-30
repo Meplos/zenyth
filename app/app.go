@@ -18,7 +18,6 @@ type App struct {
 	db        *db.ZenythDatabase
 	scheduler *cron.Cron
 	taskFile  string
-	server    *server.ZenythServer
 }
 
 func Init() *App {
@@ -29,7 +28,6 @@ func Init() *App {
 		db:        zdb,
 		scheduler: scheduler,
 		taskFile:  "zenyth.tasks.json",
-		server:    server.Init(),
 	}
 }
 
@@ -58,14 +56,12 @@ func (a *App) Run() {
 		}
 	}()
 
-	go a.server.Run()
 	for true {
 	}
 }
 
 func (a *App) Stop() {
 	a.scheduler.Stop()
-	a.server.Stop()
 	os.Exit(0)
 }
 

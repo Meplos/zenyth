@@ -1,0 +1,43 @@
+{{ template "partials/header" .}}
+
+<div class="tasks-container">
+	<table class="table is-striped is-hoverable">
+		<thead>
+			<tr>
+				<td scope="col">
+					Task name
+				</td>
+				<td scope="">
+					Exec command
+				</td>
+				<td scope="col">
+					Runner
+				</td>
+				<td scope="col">
+					State
+				</td>
+				<td scope="col">
+					Actions
+				</td>
+			</tr>
+
+		</thead>
+		<tbody>
+			{{ range .Tasks}}
+			<tr>
+				<td scope="row">{{ .Name }}</td>
+				<td>{{ .Exec }}</td>
+				<td>{{ .Runner }}</td>
+				<td {{if eq .State "PENDING" }} class="is-success" {{end}} {{if eq .State "STOPPED" }}
+					class="is-warning" {{end}} {{if eq .State "ERRORED" }} class="is-danger" {{end}}
+					{{if eq .State "RUNNING" }} class="is-primary" {{end}}>{{ .State
+					}}</td>
+				<td></td>
+			</tr>
+			{{ end }}
+		</tbody>
+	</table>
+</div>
+
+
+{{ template "partials/footer" .}}
