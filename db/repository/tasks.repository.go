@@ -14,6 +14,7 @@ type TaskEntity struct {
 	State   string
 
 	Cron       string
+	Second     string
 	Minute     string
 	Hour       string
 	DayInMonth string

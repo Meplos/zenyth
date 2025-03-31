@@ -8,6 +8,7 @@ import (
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type ZenythDatabase struct {
@@ -45,7 +46,10 @@ func (zDB *ZenythDatabase) ListTask() []tasks.Task {
 
 func (zDB *ZenythDatabase) ListExecution(name string) []tasks.Execution {
 	var dbExec []repo.ExecutionEntity
-	result := zDB.Db.Where("task = ?", name).Find(&dbExec)
+	result := zDB.Db.Where("task = ?", name).Order(clause.OrderByColumn{
+		Column: clause.Column{Name: "Start"},
+		Desc:   true,
+	}).Find(&dbExec)
 	if result.Error != nil {
 		log.Fatalf("Query all tasks fail")
 	}

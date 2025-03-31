@@ -46,7 +46,9 @@ type Task struct {
 	State   TaskState
 	Runner  string
 
-	Cron       string
+	Cron string
+
+	Second     string
 	Minute     string
 	Hour       string
 	DayInMonth string
@@ -59,7 +61,7 @@ type Task struct {
 
 func NewTask(def TaskDef) *Task {
 	cronExpr := strings.Split(def.Cron, " ")
-	if len(cronExpr) != 5 {
+	if len(cronExpr) != 6 {
 		log.Fatalf("Invalid CRON expression for %v", def.Name)
 	}
 	bytes := taskToBytes(def)
@@ -75,11 +77,12 @@ func NewTask(def TaskDef) *Task {
 		Hash:    string(hash[:]),
 
 		Cron:       def.Cron,
-		Minute:     cronExpr[0],
-		Hour:       cronExpr[1],
-		DayInMonth: cronExpr[2],
-		Month:      cronExpr[3],
-		DayInWeek:  cronExpr[4],
+		Second:     cronExpr[0],
+		Minute:     cronExpr[1],
+		Hour:       cronExpr[2],
+		DayInMonth: cronExpr[3],
+		Month:      cronExpr[4],
+		DayInWeek:  cronExpr[5],
 
 		taskObserver: make([]observer.Observer[Task], 0),
 		execObserver: make([]observer.Observer[Execution], 0),
@@ -177,6 +180,7 @@ func FromEntity(t repository.TaskEntity) Task {
 		Hash:    t.Hash,
 
 		Cron:       t.Cron,
+		Second:     t.Second,
 		Minute:     t.Minute,
 		Hour:       t.Hour,
 		DayInMonth: t.DayInMonth,

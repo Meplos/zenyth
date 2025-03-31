@@ -8,7 +8,6 @@ import (
 	"github.com/Meplos/zenyth/config"
 	"github.com/Meplos/zenyth/db"
 	"github.com/Meplos/zenyth/observer"
-	"github.com/Meplos/zenyth/server"
 	taskobserver "github.com/Meplos/zenyth/taskObserver"
 	"github.com/Meplos/zenyth/tasks"
 	"github.com/robfig/cron"
