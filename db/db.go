@@ -43,6 +43,20 @@ func (zDB *ZenythDatabase) ListTask() []tasks.Task {
 	return ts
 }
 
+func (zDB *ZenythDatabase) ListExecution(name string) []tasks.Execution {
+	var dbExec []repo.ExecutionEntity
+	result := zDB.Db.Where("task = ?", name).Find(&dbExec)
+	if result.Error != nil {
+		log.Fatalf("Query all tasks fail")
+	}
+
+	execs := make([]tasks.Execution, 0)
+	for _, e := range dbExec {
+		execs = append(execs, tasks.ExecutionFromEntity(e))
+	}
+	return execs
+}
+
 func (zDB *ZenythDatabase) CreateTask(t tasks.Task) {
 	newTask := repo.TaskEntity{
 		Name:    t.Name,

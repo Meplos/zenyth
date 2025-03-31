@@ -1,6 +1,10 @@
 package tasks
 
-import "time"
+import (
+	"time"
+
+	"github.com/Meplos/zenyth/db/repository"
+)
 
 type Execution struct {
 	Task     string
@@ -18,5 +22,15 @@ func NewExecution(name string, start, end time.Time, status ProcessState) Execut
 		End:      end,
 		Duration: execDuration,
 		Status:   status,
+	}
+}
+
+func ExecutionFromEntity(entity repository.ExecutionEntity) Execution {
+	return Execution{
+		Task:     entity.Task,
+		Start:    entity.Start,
+		End:      entity.End,
+		Duration: entity.Duration,
+		Status:   ProcessState(entity.Status),
 	}
 }

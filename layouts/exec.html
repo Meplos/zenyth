@@ -1,0 +1,46 @@
+{{ template "partials/header" .}}
+
+<div class="arr-title">
+	<h1 class="title">{{ .Title }}</h1>
+</div>
+<div class="tasks-container">
+	<table class="table is-striped is-hoverable">
+		<thead>
+			<tr>
+				<td scope="col">
+					Status
+				</td>
+				<td scope="col">
+					Duration	
+				</td>
+				<td scope="col">
+					Begin	
+				</td>
+				<td scope="col">
+					End	
+				</td>
+			</tr>
+
+		</thead>
+		<tbody>
+			{{ range .Execs }}
+			<tr>
+				<td scope="row"
+					{{if eq .Status "SUCCESS"}}
+						class="is-success"
+					{{ end }}
+					{{if eq .Status "FAILURE"}}
+						class="is-danger"
+					{{ end }}
+
+				>{{ .Status }}</td>
+				<td>{{ .Duration }}ms</td>
+				<td>{{ .Start }}</td>
+				<td>{{ .End }}</td>
+			</tr>
+			{{ end }}
+		</tbody>
+	</table>
+</div>
+
+{{ template "partials/footer" .}}

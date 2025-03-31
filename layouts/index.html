@@ -7,8 +7,11 @@
 				<td scope="col">
 					Task name
 				</td>
-				<td scope="">
+				<td scope="col">
 					Exec command
+				</td>
+				<td scope="col">
+					CRON
 				</td>
 				<td scope="col">
 					Runner
@@ -27,12 +30,31 @@
 			<tr>
 				<td scope="row">{{ .Name }}</td>
 				<td>{{ .Exec }}</td>
+				<td>{{ .Cron }}</td>
 				<td>{{ .Runner }}</td>
 				<td {{if eq .State "PENDING" }} class="is-success" {{end}} {{if eq .State "STOPPED" }}
 					class="is-warning" {{end}} {{if eq .State "ERRORED" }} class="is-danger" {{end}}
 					{{if eq .State "RUNNING" }} class="is-primary" {{end}}>{{ .State
 					}}</td>
-				<td></td>
+				<td>
+					<p class="buttons">
+						<button class="button">
+							<span class="icon">
+								<i class="fas fa-play fa-lg"></i>
+							</span>
+						</button>
+						<button class="button">
+							<span class="icon is-lg">
+								<i class="fas fa-stop fa-lg"></i>
+							</span>
+						</button>
+						<a class="button" href="/exec?task={{ .Name }}">
+							<span class="icon">
+								<i class="fas fa-file fa-lg"></i>
+							</span>
+						</a>
+					</p>
+				</td>
 			</tr>
 			{{ end }}
 		</tbody>
