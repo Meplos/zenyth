@@ -12,7 +12,6 @@ import (
 	"github.com/Meplos/zenyth/db/repository"
 	"github.com/Meplos/zenyth/observer"
 	"github.com/Meplos/zenyth/runners"
-	"github.com/robfig/cron"
 )
 
 type TaskDef struct {
@@ -34,9 +33,9 @@ const (
 
 const (
 	PENDING TaskState = "PENDING"
-	RUNING  TaskState = "RUNING"
+	RUNING  TaskState = "RUNNING"
 	ERRORED TaskState = "ERRORED"
-	STOPPED TaskState = "STOPED"
+	STOPPED TaskState = "STOPPED"
 )
 
 type Task struct {
@@ -110,6 +109,7 @@ func (t *Task) Pending() {
 func (t *Task) Errored() {
 	t.State = ERRORED
 	t.Notify(observer.Update)
+	t.Notify(observer.Errored)
 }
 
 func (t *Task) Stopped() {
@@ -144,10 +144,6 @@ func (t *Task) Run() {
 func (t *Task) EndProcess(start, end time.Time, state ProcessState) {
 	execution := NewExecution(t.Name, start, end, state)
 	t.NotifyExecution(observer.Terminated, execution)
-}
-
-func (t *Task) Schedule(c *cron.Cron) {
-	c.AddJob(t.Cron, t)
 }
 
 func (t *Task) AddTaskObserver(o observer.Observer[Task]) {
@@ -194,7 +190,5 @@ func FromEntity(t repository.TaskEntity) Task {
 		DayInMonth: t.DayInMonth,
 		Month:      t.Month,
 		DayInWeek:  t.DayInWeek,
-
-		taskObserver: make([]observer.Observer[Task], 0),
 	}
 }

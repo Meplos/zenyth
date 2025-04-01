@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/Meplos/zenyth/db"
+	"github.com/Meplos/zenyth/manager"
 	"github.com/Meplos/zenyth/tasks"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html/v2"
@@ -23,7 +24,7 @@ type ZenythServer struct {
 	db   *db.ZenythDatabase
 }
 
-func Init() *ZenythServer {
+func Init(manager *manager.CronManager) *ZenythServer {
 	engine := html.New("./layouts", ".html")
 	zServer := &ZenythServer{
 		app: fiber.New(fiber.Config{
@@ -52,6 +53,22 @@ func Init() *ZenythServer {
 			"Title": name,
 			"Execs": formatted,
 		}, "main")
+	})
+
+	zServer.app.Post("/start", func(c *fiber.Ctx) error {
+		name := c.Query("task")
+		task := zServer.db.FindTask(name)
+		manager.StartOne(task.Hash)
+		task.Pending()
+		return nil
+	})
+
+	zServer.app.Post("/stop", func(c *fiber.Ctx) error {
+		name := c.Query("task")
+		task := zServer.db.FindTask(name)
+		manager.StopOne(task.Hash)
+		task.Stopped()
+		return nil
 	})
 
 	zServer.app.Static("/public", "./public/")

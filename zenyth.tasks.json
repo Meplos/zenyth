@@ -3,6 +3,12 @@
     "name": "cron-test-1",
     "runner": "bin",
     "exec": "/bin/ls",
-    "cron": "*/2 * * * * *"
+    "cron": "*/30 * * * * *"
+  },
+  {
+    "name": "hello-world-1",
+    "runner": "bun",
+    "exec": "/Users/aerard/Documents/perso/bun-script/index.ts",
+    "cron": "0 */2 * * * *"
   }
 ]

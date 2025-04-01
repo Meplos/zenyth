@@ -50,12 +50,12 @@
 					}}</td>
 				<td>
 					<p class="buttons">
-						<button class="button">
+						<button class="button" hx-post="/start?task={{ .Name }}">
 							<span class="icon">
 								<i class="fas fa-play fa-lg"></i>
 							</span>
 						</button>
-						<button class="button">
+						<button class="button" hx-post="/stop?task={{ .Name }}">
 							<span class="icon is-lg">
 								<i class="fas fa-stop fa-lg"></i>
 							</span>
