@@ -10,6 +10,12 @@
 				<td scope="col">
 					Exec command
 				</td>
+				<td scope="col">Second</td>
+				<td scope="col">Minute</td>
+				<td scope="col">Hour</td>
+				<td scope="col">Day in month</td>
+				<td scope="col">Month</td>
+				<td scope="col">Day in week</td>
 				<td scope="col">
 					CRON
 				</td>
@@ -30,6 +36,12 @@
 			<tr>
 				<td scope="row">{{ .Name }}</td>
 				<td>{{ .Exec }}</td>
+				<td>{{ .Second }}</td>
+				<td>{{ .Minute }}</td>
+				<td>{{ .Hour }}</td>
+				<td>{{ .DayInMonth }}</td>
+				<td>{{ .Month }}</td>
+				<td>{{ .DayInWeek}}</td>
 				<td>{{ .Cron }}</td>
 				<td>{{ .Runner }}</td>
 				<td {{if eq .State "PENDING" }} class="is-success" {{end}} {{if eq .State "STOPPED" }}

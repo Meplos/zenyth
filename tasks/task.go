@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -55,6 +56,7 @@ type Task struct {
 	Month      string
 	DayInWeek  string
 
+	logger       *log.Logger
 	taskObserver []observer.Observer[Task]
 	execObserver []observer.Observer[Execution]
 }
@@ -65,13 +67,18 @@ func NewTask(def TaskDef) *Task {
 		log.Fatalf("Invalid CRON expression for %v", def.Name)
 	}
 	bytes := taskToBytes(def)
-
 	hash := md5.Sum(bytes)
-
+	logFile := fmt.Sprintf("%v.log", def.Name)
+	f, err := os.OpenFile(logFile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0660)
+	if err != nil {
+		log.Printf("%v", err)
+		log.Fatalf("Cannot open logfile %v", logFile)
+	}
+	logger := log.New(f, def.Name, log.LstdFlags)
 	return &Task{
 		Name:    def.Name,
 		Exec:    def.Exec,
-		LogFile: fmt.Sprintf("/tmp/.zenyth/%v.log", def.Name),
+		LogFile: logFile,
 		State:   PENDING,
 		Runner:  def.Runner,
 		Hash:    string(hash[:]),
@@ -84,6 +91,7 @@ func NewTask(def TaskDef) *Task {
 		Month:      cronExpr[4],
 		DayInWeek:  cronExpr[5],
 
+		logger:       logger,
 		taskObserver: make([]observer.Observer[Task], 0),
 		execObserver: make([]observer.Observer[Execution], 0),
 	}
@@ -119,7 +127,7 @@ func (t *Task) Run() {
 	end := time.Now()
 	lines := strings.Split(string(output), "\n")
 	for _, l := range lines {
-		log.Printf(l)
+		t.logger.Printf(l)
 	}
 	if err != nil {
 		t.Errored()

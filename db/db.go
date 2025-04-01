@@ -71,6 +71,7 @@ func (zDB *ZenythDatabase) CreateTask(t tasks.Task) {
 		Hash:    t.Hash,
 
 		Cron:       t.Cron,
+		Second:     t.Second,
 		Minute:     t.Minute,
 		Hour:       t.Hour,
 		DayInMonth: t.DayInMonth,
