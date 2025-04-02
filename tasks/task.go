@@ -67,7 +67,7 @@ func NewTask(def TaskDef) *Task {
 	}
 	bytes := taskToBytes(def)
 	hash := md5.Sum(bytes)
-	logFile := fmt.Sprintf("%v.log", def.Name)
+	logFile := fmt.Sprintf("/var/log/.zenyth/%v.log", def.Name)
 	f, err := os.OpenFile(logFile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0660)
 	if err != nil {
 		log.Printf("%v", err)
@@ -121,7 +121,7 @@ func (t *Task) Run() {
 	start := time.Now()
 	t.Running()
 	log.Printf("Task starting %v, with command %v [hash=%v, state=%v]", t.Name, t.Exec, string(t.Hash[:]), t.State)
-	// Execute commande
+	// Execute command
 	runner := runners.GetRunner(t.Runner)
 	output, err := runner.Exec(t.Exec)
 	end := time.Now()

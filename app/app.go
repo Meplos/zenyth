@@ -3,7 +3,6 @@ package app
 import (
 	"log"
 	"os"
-	"os/signal"
 
 	"github.com/Meplos/zenyth/config"
 	"github.com/Meplos/zenyth/db"
@@ -43,23 +42,12 @@ func (a *App) Run() {
 	eo := taskobserver.NewExecutionObserver(a.db)
 	var t *tasks.Task
 	for _, def := range definitions {
-		t = a.loadTask(def, a.db, &to)
+		t = a.LoadTask(def, a.db, &to)
 		t.AddExecutionObserver(&eo)
 		a.manager.ScheduleTasks(t)
 	}
 
 	a.manager.StartAll()
-
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	go func() {
-		for range c {
-			a.Stop()
-		}
-	}()
-
-	for true {
-	}
 }
 
 func (a *App) Stop() {
@@ -67,7 +55,7 @@ func (a *App) Stop() {
 	os.Exit(0)
 }
 
-func (a *App) loadTask(t tasks.TaskDef, db *db.ZenythDatabase, o observer.Observer[tasks.Task]) *tasks.Task {
+func (a *App) LoadTask(t tasks.TaskDef, db *db.ZenythDatabase, o observer.Observer[tasks.Task]) *tasks.Task {
 	log.Printf("Load %v\n", t.Name)
 	saveTask := db.FindTask(t.Name)
 	newTask := tasks.NewTask(t)

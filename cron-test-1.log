@@ -682,3 +682,23 @@ cron-test-12025/04/01 22:34:30 tasks
 cron-test-12025/04/01 22:34:30 zenyth.db
 cron-test-12025/04/01 22:34:30 zenyth.tasks.json
 cron-test-12025/04/01 22:34:30 
+cron-test-12025/04/02 19:53:30 app
+cron-test-12025/04/02 19:53:30 config
+cron-test-12025/04/02 19:53:30 cron-test-1.log
+cron-test-12025/04/02 19:53:30 db
+cron-test-12025/04/02 19:53:30 go.mod
+cron-test-12025/04/02 19:53:30 go.sum
+cron-test-12025/04/02 19:53:30 hello-world-1.log
+cron-test-12025/04/02 19:53:30 layouts
+cron-test-12025/04/02 19:53:30 main.go
+cron-test-12025/04/02 19:53:30 manager
+cron-test-12025/04/02 19:53:30 observer
+cron-test-12025/04/02 19:53:30 public
+cron-test-12025/04/02 19:53:30 runners
+cron-test-12025/04/02 19:53:30 server
+cron-test-12025/04/02 19:53:30 taskObserver
+cron-test-12025/04/02 19:53:30 tasks
+cron-test-12025/04/02 19:53:30 zenyth
+cron-test-12025/04/02 19:53:30 zenyth.db
+cron-test-12025/04/02 19:53:30 zenyth.tasks.json
+cron-test-12025/04/02 19:53:30 
